@@ -1,41 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import { products } from '../../mock/products';
 import { useParams } from 'react-router-dom';
 import ItemList from './ItemList';
+import { productsCollection } from '../../firebaseConfing';
+import { getDocs , query , where } from "firebase/firestore"
+import { toast } from 'react-toastify';
 
-const ItemListContainer = ({ titulo }) => {
+
+
+const ItemListContainer = ({ saludo }) => {
+    
     const [items, setItems] = useState([]);
 
     const { categoryName } = useParams();
 
     useEffect(() => {
-        const getProducts = () => {
-            return new Promise((res, rej) => {
-                const productosFiltrados = products.filter(
-                    (prod) => prod.category === categoryName
-                );
 
-                const prodListados = categoryName
-                    ? productosFiltrados
-                    : products;
-                setTimeout(() => {
-                    res(prodListados);
-                }, 500);
-            });
-        };
+        const getProducts = () => {
+            
+                let filtro 
+
+                if(categoryName){
+                 filtro = query(productsCollection,where("categoria","==",categoryName))
+                }else {
+                    filtro = productsCollection
+                }
+
+                const pedidoPorCategoria = getDocs(filtro)
+    
+                pedidoPorCategoria
+                    .then((resultado) => {
+                        const productos = resultado.docs.map((doc) => {
+                            return { id : doc.id , ...doc.data() }
+                        })
+                        toast.info("Loading...")
+                        setItems(productos)
+                    })
+                    .catch((error) => {
+                        toast("Hubo un error!")
+                        console.log(error)
+                    })
+        }
+
         getProducts()
-            .then((res) => {
-                setItems(res);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+
     }, [categoryName]);
 
 
     return (
-        <div id="title" className="container container-page">
-            <h2>{titulo}</h2>
+        <div id="eduardo" className="container container-page">
+            <h2>{saludo}</h2>
             <ItemList items={items} />
         </div>
     );

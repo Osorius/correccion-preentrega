@@ -19,9 +19,8 @@ const Navbar = () => {
                     <NavLink to="/nosotros">Nosotros</NavLink>
                 </li>
             </ul>
-            <
-                <CartWidget />
-            </>
+            <CartWidget />
+            
         </nav>
     );
 };

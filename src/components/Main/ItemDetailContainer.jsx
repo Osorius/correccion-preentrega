@@ -1,36 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import ItemDetail from './ItemDetail';
-import { products } from '../../mock/products';
 import { useParams } from 'react-router-dom';
+import { getDoc, doc } from "firebase/firestore"
+import { productsCollection } from '../../firebaseConfing';
+
+
 
 const ItemDetailContainer = () => {
+
     const [item, setItem] = useState({});
+    const [cargando,setCargando] = useState(true)
 
     const valor = useParams();
-    console.log(valor);
 
     useEffect(() => {
         const getProduct = () => {
-            return new Promise((res, rej) => {
-                const productoEncontrado = products.find(
-                    (prod) => prod.id === 1
-                );
-                setTimeout(() => {
-                    res(productoEncontrado);
-                }, 500);
-            });
+            
+            const referenciaDoc = doc(productsCollection,"7L4YlnHAB7bhW9uwXNCb")
+            const pedido = getDoc(referenciaDoc)
+
+            pedido
+                .then((resultado) => {
+                    const producto = resultado.data()
+                    setItem(producto)
+                    setCargando(false)
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
         };
 
         getProduct()
-            .then((res) => {
-                setItem(res);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+
     }, []);
 
-    return <ItemDetail item={item} />;
+    return <>{!cargando ? <ItemDetail item={item} /> : <p>Cargando...</p>}</>;
 };
 
 export default ItemDetailContainer;

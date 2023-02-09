@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const Contador = ({ stock }) => {
+const Contador = ({ stock, handleAdd  }) => {
     const [cantidad, setCantidad] = useState(1);
 
     const sumar = () => {
@@ -14,6 +14,11 @@ const Contador = ({ stock }) => {
             setCantidad(cantidad - 1);
         }
     };
+
+    
+    const handleConfirmar = () => {
+        handleAdd(cantidad)
+    }
 
     return (
         <div className="container-counter">
